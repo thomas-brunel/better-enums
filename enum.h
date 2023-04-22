@@ -683,18 +683,30 @@ class BETTER_ENUMS_CLASS_ATTRIBUTE Enum {                                      \
     BETTER_ENUMS_IF_EXCEPTIONS(                                                \
     BETTER_ENUMS_CONSTEXPR_ static Enum _from_string(const char *name);        \
     )                                                                          \
+    BETTER_ENUMS_IF_EXCEPTIONS(                                                \
+    BETTER_ENUMS_CONSTEXPR_ static Enum _from_string(const std::string& name); \
+    )                                                                          \
     BETTER_ENUMS_CONSTEXPR_ static _optional                                   \
     _from_string_nothrow(const char *name);                                    \
+    BETTER_ENUMS_CONSTEXPR_ static _optional                                   \
+    _from_string_nothrow(const std::string& name);                             \
                                                                                \
     BETTER_ENUMS_IF_EXCEPTIONS(                                                \
     BETTER_ENUMS_CONSTEXPR_ static Enum _from_string_nocase(const char *name); \
     )                                                                          \
+    BETTER_ENUMS_IF_EXCEPTIONS(                                                \
+    BETTER_ENUMS_CONSTEXPR_ static Enum _from_string_nocase(const std::string& name);\
+    )                                                                          \
     BETTER_ENUMS_CONSTEXPR_ static _optional                                   \
     _from_string_nocase_nothrow(const char *name);                             \
+    BETTER_ENUMS_CONSTEXPR_ static _optional                                   \
+    _from_string_nocase_nothrow(const std::string& name);                      \
                                                                                \
     BETTER_ENUMS_CONSTEXPR_ static bool _is_valid(_integral value);            \
     BETTER_ENUMS_CONSTEXPR_ static bool _is_valid(const char *name);           \
+    BETTER_ENUMS_CONSTEXPR_ static bool _is_valid(const std::string& name);    \
     BETTER_ENUMS_CONSTEXPR_ static bool _is_valid_nocase(const char *name);    \
+    BETTER_ENUMS_CONSTEXPR_ static bool _is_valid_nocase(const std::string& name);\
                                                                                \
     typedef ::better_enums::_iterable<Enum>             _value_iterable;       \
     typedef ::better_enums::_iterable<const char*>      _name_iterable;        \
@@ -875,6 +887,15 @@ BETTER_ENUMS_CONSTEXPR_ inline Enum Enum::_from_string(const char *name)       \
 }                                                                              \
 )                                                                              \
                                                                                \
+BETTER_ENUMS_IF_EXCEPTIONS(                                                    \
+BETTER_ENUMS_CONSTEXPR_ inline Enum Enum::_from_string(const std::string& name)\
+{                                                                              \
+    return                                                                     \
+        ::better_enums::_or_throw(_from_string_nothrow(name.c_str()),          \
+                                  #Enum "::_from_string: invalid argument");   \
+}                                                                              \
+)                                                                              \
+                                                                               \
 BETTER_ENUMS_CONSTEXPR_ inline Enum::_optional                                 \
 Enum::_from_string_nocase_nothrow(const char *name)                            \
 {                                                                              \
@@ -883,12 +904,30 @@ Enum::_from_string_nocase_nothrow(const char *name)                            \
                                          _from_string_nocase_loop(name));      \
 }                                                                              \
                                                                                \
+BETTER_ENUMS_CONSTEXPR_ inline Enum::_optional                                 \
+Enum::_from_string_nocase_nothrow(const std::string& name)                     \
+{                                                                              \
+    return                                                                     \
+        ::better_enums::_map_index<Enum>(BETTER_ENUMS_NS(Enum)::_value_array,  \
+                                       _from_string_nocase_loop(name.c_str()));\
+}                                                                              \
+                                                                               \
 BETTER_ENUMS_IF_EXCEPTIONS(                                                    \
 BETTER_ENUMS_CONSTEXPR_ inline Enum Enum::_from_string_nocase(const char *name)\
 {                                                                              \
     return                                                                     \
         ::better_enums::_or_throw(                                             \
             _from_string_nocase_nothrow(name),                                 \
+            #Enum "::_from_string_nocase: invalid argument");                  \
+}                                                                              \
+)                                                                              \
+                                                                               \
+BETTER_ENUMS_IF_EXCEPTIONS(                                                    \
+BETTER_ENUMS_CONSTEXPR_ inline Enum Enum::_from_string_nocase(const std::string& name)\
+{                                                                              \
+    return                                                                     \
+        ::better_enums::_or_throw(                                             \
+            _from_string_nocase_nothrow(name.c_str()),                         \
             #Enum "::_from_string_nocase: invalid argument");                  \
 }                                                                              \
 )                                                                              \
@@ -903,9 +942,19 @@ BETTER_ENUMS_CONSTEXPR_ inline bool Enum::_is_valid(const char *name)          \
     return _from_string_loop(name);                                            \
 }                                                                              \
                                                                                \
+BETTER_ENUMS_CONSTEXPR_ inline bool Enum::_is_valid(const std::string& name)   \
+{                                                                              \
+    return _from_string_loop(name.c_str());                                    \
+}                                                                              \
+                                                                               \
 BETTER_ENUMS_CONSTEXPR_ inline bool Enum::_is_valid_nocase(const char *name)   \
 {                                                                              \
     return _from_string_nocase_loop(name);                                     \
+}                                                                              \
+                                                                               \
+BETTER_ENUMS_CONSTEXPR_ inline bool Enum::_is_valid_nocase(const std::string& name)\
+{                                                                              \
+    return _from_string_nocase_loop(name.c_str());                             \
 }                                                                              \
                                                                                \
 BETTER_ENUMS_CONSTEXPR_ inline const char* Enum::_name()                       \
